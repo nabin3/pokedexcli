@@ -5,25 +5,22 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/nabin3/pokedexcli/internal/pokeapi"
 )
 
-func startRepl() {
+type config struct {
+	pokeapiClient    pokeapi.Client
+	caughtPokemon    map[string]pokeapi.RespPokemon
+	nextLocationsURL *string
+	prevLocationsURL *string
+}
 
-	// Retrieving a pointer of an insatnce of Scanner struct
+func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
-
-	// This outer for loop is for REPL mechanism
 	for {
-		fmt.Print("pokedex> ")
-
-		// Scan fuction read given command from console
+		fmt.Print("Pokedex > ")
 		reader.Scan()
-
-		// This Err method return the first error in the event of reading by Scan mathod
-		if err := reader.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "This error occured:", err)
-			continue
-		}
 
 		words := cleanInput(reader.Text())
 		if len(words) == 0 {
@@ -31,23 +28,28 @@ func startRepl() {
 		}
 
 		commandName := words[0]
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
+		}
 
-		// Checking if given command exist as key in commandMap
-		if command, commandExists := getCommands()[commandName]; !commandExists {
-			fmt.Println("invalid command")
-		} else {
-			// If given command is valid command(exist in commandMap) then invoke it's callback fuction
-			err := command.callback()
+		command, exists := getCommands()[commandName]
+		if exists {
+			err := command.callback(cfg, args...)
+
 			if err != nil {
-				fmt.Printf("failed to execute command %s: %v \n", commandName, err)
+				fmt.Println(err)
 			}
+			continue
+		} else {
+			fmt.Println("Unknown command")
+			continue
 		}
 	}
-
 }
 
-func cleanInput(input string) []string {
-	output := strings.ToLower(input)
+func cleanInput(text string) []string {
+	output := strings.ToLower(text)
 	words := strings.Fields(output)
 	return words
 }
