@@ -6,8 +6,9 @@ import (
 	"net/http"
 )
 
+// ListPokemons -
 func (c *Client) ListPokemons(area string) (RespShallowPokemons, error) {
-	url := baseURL + "/location-area/" + area
+	url := baseURL + "/location-area/" + area // Constructing URL
 
 	// If url's response present in cache then get the the response from there
 	if val, ok := c.cache.Get(url); ok {

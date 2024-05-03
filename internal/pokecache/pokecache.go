@@ -5,27 +5,32 @@ import (
 	"time"
 )
 
+// This struct is blueprint for cached data which was retrieved at a certain time
 type cachEntry struct {
 	createdAt time.Time
 	val       []byte
 }
 
+// This struct is blueprint for storing each cacheEntry struct instance
 type ResponseCache struct {
-	cacheMap map[string]cachEntry
-	mu       *sync.Mutex
+	cacheMap map[string]cachEntry // Storage of cache, this map key is the URL, to which the retriever(funcs which make requests to pokepi endpoints) funcs made request
+	mu       *sync.Mutex          // mutex used to prevent race condition
 }
 
+// This function creates a newcache, Before requesting to pokepi endpoint our retriever fincs will look at this cache storage, this cache storage also deletes expired cachEntry in a predefined time interval
 func NewCache(interval time.Duration) ResponseCache {
 	c := ResponseCache{
 		cacheMap: make(map[string]cachEntry),
 		mu:       &sync.Mutex{},
 	}
 
+	// CachEntry created before certain amount time should be deleted from cacheMap
 	go c.reapLoop(interval)
 
 	return c
 }
 
+// This func add new cachEntry to cacheMap
 func (cache *ResponseCache) Add(key string, value []byte) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -35,6 +40,7 @@ func (cache *ResponseCache) Add(key string, value []byte) {
 	}
 }
 
+// Retrirving a cachEntry from cacheMap
 func (cache *ResponseCache) Get(key string) ([]byte, bool) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -47,6 +53,7 @@ func (cache *ResponseCache) Get(key string) ([]byte, bool) {
 	return value.val, true
 }
 
+// This func implement a time loop which will triger reap func in each time interval
 func (cache *ResponseCache) reapLoop(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 
@@ -56,6 +63,7 @@ func (cache *ResponseCache) reapLoop(interval time.Duration) {
 	}
 }
 
+// This func delete expired cachEntry from cachMap
 func (cache *ResponseCache) reap(currentTime time.Time, last time.Duration) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()

@@ -8,15 +8,15 @@ import (
 
 // ListLocations -
 func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
-	url := baseURL + "/location-area"
+	url := baseURL + "/location-area" // Constructing url
 	if pageURL != nil {
-		url = *pageURL
+		url = *pageURL // If a URL is passed to ListLocations func then url is updated
 	}
 
 	// If url's response present in cache then get the the response from there
 	if val, ok := c.cache.Get(url); ok {
 		locationsResp := RespShallowLocations{}
-		err := json.Unmarshal(val, &locationsResp)
+		err := json.Unmarshal(val, &locationsResp) // Decoding retrieved val(data) from cache
 		if err != nil {
 			return RespShallowLocations{}, err
 		}
@@ -24,7 +24,7 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 		return locationsResp, nil
 	}
 
-	// Creating an instance of http.Request
+	// Creating an instance of http.Request when request URL response couldn't be found in cache
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return RespShallowLocations{}, err
@@ -43,6 +43,7 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 		return RespShallowLocations{}, err
 	}
 
+	// Decoding data retrieved from response obtained from pokeapi server
 	locationsResp := RespShallowLocations{}
 	err = json.Unmarshal(dat, &locationsResp)
 	if err != nil {

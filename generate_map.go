@@ -1,11 +1,13 @@
 package main
 
+// Struct for representing each command
 type cliCommand struct {
 	name        string
 	description string
 	callback    func(*config, ...string) error
 }
 
+// This function will return map,holds commands of pokdexcli
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {

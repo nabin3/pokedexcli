@@ -1,5 +1,6 @@
 package pokeapi
 
+// BluePrint for retrieving pokemon names from pokeapi response(in JSON format)
 type RespShallowPokemons struct {
 	PokemonEncounters []struct {
 		Pokemon struct {
@@ -8,6 +9,7 @@ type RespShallowPokemons struct {
 	} `json:"pokemon_encounters"`
 }
 
+// BluePrint for extracting pokemon's details from pokapi response
 type RespPokemon struct {
 	Forms []struct {
 		Name string `json:"name"`
