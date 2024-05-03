@@ -1,13 +1,13 @@
 package main
 
-
+// Struct for representing each command
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config, ...string) error
 }
 
-
+// This function will return map,holds commands of pokdexcli
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
@@ -23,15 +23,39 @@ func getCommands() map[string]cliCommand {
 		},
 
 		"map": {
-			name: "map",
+			name:        "map",
 			description: "Print 20 location areas of pokemon world",
-			callback: commandMap,
+			callback:    commandMapf,
 		},
 
 		"mapb": {
-			name: "mapb",
+			name:        "mapb",
 			description: "Print previous 20 location areas of pokemon world",
-			callback: commandMapb,
-		},		
+			callback:    commandMapb,
+		},
+
+		"explore": {
+			name:        "explore",
+			description: "Print pokemons who are available in a given area",
+			callback:    commandExplore,
+		},
+
+		"catch": {
+			name:        "catch",
+			description: "Try to catch a pokemon",
+			callback:    commandCatch,
+		},
+
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a pokemon",
+			callback:    commandInspect,
+		},
+
+		"pokedex": {
+			name:        "pokedex",
+			description: "List all caught pokemons",
+			callback:    commandPokedex,
+		},
 	}
 }
